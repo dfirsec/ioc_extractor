@@ -69,8 +69,8 @@ def main(source):
 
     if files:
         for filename in files:
-            with open(filename, encoding="utf-8") as txt_file:
-                for line in txt_file:
+            with open(filename, encoding="utf-8") as fileobj:
+                for line in fileobj:
                     for name, regex_type in regex.regex_patterns(line).items():
                         for pattern in regex_type:
                             add_values_in_dict(data, name, [pattern.lower().replace("[.]", ".").replace(",url,,", "")])
@@ -78,16 +78,18 @@ def main(source):
         sys.exit("[!] Doesn't appear to be any files that exist with .txt, .csv, or .xml extensions.")
 
     new_dict = {a: list(set(b)) for a, b in data.items()}
-    json_obj = json.dumps(new_dict, indent=4)
+    jsonobj = json.dumps(new_dict, indent=4)
+    root = Path(__file__).resolve().parent
+    results = root.joinpath("results.json")
 
-    if json_obj and new_dict:
-        data = json.loads(json_obj)
+    if jsonobj and new_dict:
+        data = json.loads(jsonobj)
         for key in data:
             print(f"\n{key} Count: {len(data[key])}\n==================")
             for value in data[key]:
                 print(value)
 
-        with open("data.json", "w", encoding="utf-8") as outfile:
+        with open(results, "w", encoding="utf-8") as outfile:
             json.dump(new_dict, outfile, indent=4)
 
 
