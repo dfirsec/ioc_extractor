@@ -77,12 +77,12 @@ def main(source):
     else:
         sys.exit("[!] Doesn't appear to be any files that exist with .txt, .csv, or .xml extensions.")
 
-    new_dict = {a: list(set(b)) for a, b in data.items()}
-    jsonobj = json.dumps(new_dict, indent=4)
+    dictnew = {a: list(set(b)) for a, b in data.items()}
+    jsonobj = json.dumps(dictnew, indent=4)
     root = Path(__file__).resolve().parent
     results = root.joinpath("results.json")
 
-    if jsonobj and new_dict:
+    if jsonobj and dictnew:
         data = json.loads(jsonobj)
         for key in data:
             print(f"\n{key} Count: {len(data[key])}\n==================")
@@ -90,7 +90,7 @@ def main(source):
                 print(value)
 
         with open(results, "w", encoding="utf-8") as outfile:
-            json.dump(new_dict, outfile, indent=4)
+            json.dump(dictnew, outfile, indent=4)
 
 
 if __name__ == "__main__":
