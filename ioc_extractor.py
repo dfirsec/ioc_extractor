@@ -49,6 +49,15 @@ class RegexHelper:
 
 
 def get_files(source, extensions):
+    """
+    Takes a source directory and a list of file extensions and returns a list of all files in the
+    source directory that match the extensions.
+
+    :param source: The directory where the files are located
+    :param extensions: a list of file extensions to look for
+    :return: A list of all files in the source directory that have the extensions in the extensions
+    list.
+    """
     all_files = []
     for ext in extensions:
         all_files.extend(Path(source).glob(ext))
@@ -56,6 +65,16 @@ def get_files(source, extensions):
 
 
 def add_values_in_dict(data_dict, key, values):
+    """
+    If the key is not in the dictionary, add it and set it to an empty list. Otherwise, add the values
+    to the list.
+
+    :param data_dict: The dictionary to add the values to
+    :param key: The key to add to the dictionary
+    :param values: a list of values to add to the dictionary
+    :return: A dictionary with the key being the first element of the list and the values being the rest
+    of the elements in the list.
+    """
     if key not in data_dict:
         data_dict[key] = []
     data_dict[key].extend(values)
