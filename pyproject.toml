@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ioc-extractor"
+version = "0.1.1"
+description = "Extract IOCs from 'text' type files"
+authors = ["Mitch Haddadi <12067255+dfirsec@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "ioc_extractor"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+rich = "^13.3.4"
+chardet = "^5.1.0"
+requests = "^2.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
