@@ -1,6 +1,6 @@
 # IOC Extractor
 
-### Extract IOCs from txt, csv, or xml files
+### Extract IOCs from 'text' type files
 
 **IOCs:**
 
@@ -12,4 +12,4 @@
 - SHA256 hashes
 - URLs
 
-Usage: `python ioc_extractor.py <Directory containing IOCs>`
+Usage: `python ioc_extractor.py <Directory containing potential IOCs>`
