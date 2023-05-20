@@ -7,20 +7,20 @@ from rich.logging import RichHandler
 class LazyFileHandler(logging.FileHandler):
     """A file handler that is initialized only when an error is logged."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self: "LazyFileHandler", *args, **kwargs) -> None:
         """Initialization that stores the arguments and keyword arguments passed to it."""
         self._args = args
         self._kwargs = kwargs
         self._initialized = False
 
-    def _initialize(self):
+    def _initialize(self: "LazyFileHandler") -> None:
+        """Initializes the file handler if it has not been initialized yet."""
         if not self._initialized:
-            super().__init__(*self._args, **self._kwargs)  # noqa: WPS613
+            super().__init__(*self._args, **self._kwargs)
             self._initialized = True
 
     def emit(self, record: logging.LogRecord) -> None:
-        """
-        Emits a log record if its level is equal to or greater than ERROR.
+        """Emits a log record if its level is equal to or greater than ERROR.
 
         Args:
             record (logging.LogRecord):
@@ -32,8 +32,7 @@ class LazyFileHandler(logging.FileHandler):
 
 
 def logger() -> logging.Logger:
-    """
-    Sets up a logger with a file handler for errors, and returns the logger object.
+    """Sets up a logger with a file handler for errors, and returns the logger object.
 
     Returns:
         A logger object with a configured logging level, format, and handlers, including a file

@@ -1,16 +1,14 @@
 """Desc: Helper class for regular expressions."""
 import re
 from pathlib import Path
-from typing import List
 
 import requests
 from utils.console import console
 from utils.logger import logger
 
 
-def get_valid_tlds() -> List[str]:
-    """
-    Uses a list of top-level domains (TLDs) and returns the list of TLDs.
+def get_valid_tlds() -> list[str]:
+    """Uses a list of top-level domains (TLDs) and returns the list of TLDs.
 
     Returns:
         A list of valid top-level domains (TLDs) either from a local file named "tlds.txt" or by
@@ -23,9 +21,8 @@ def get_valid_tlds() -> List[str]:
         return download_tlds()
 
 
-def download_tlds() -> List[str]:
-    """
-    Downloads a list of valid top-level domains (TLDs) and saves them to a file.
+def download_tlds() -> list[str]:
+    """Downloads a list of valid top-level domains (TLDs) and saves them to a file.
 
     Returns:
         A list of valid top-level domains (TLDs) that have been downloaded and
@@ -47,7 +44,7 @@ def download_tlds() -> List[str]:
     return valid_tlds
 
 
-class RegexHelper(object):
+class RegexHelper:
     """Helper class for regular expressions."""
 
     def __init__(self):
@@ -55,8 +52,7 @@ class RegexHelper(object):
         self.tlds = get_valid_tlds()
 
     def regex(self, retype: str) -> re.Pattern:
-        """
-        Returns a compiled regular expression pattern based on the input type.
+        """Returns a compiled regular expression pattern based on the input type.
 
         Args:
             retype (str):
@@ -89,9 +85,8 @@ class RegexHelper(object):
         }
         return re.compile(pattern[retype], re.IGNORECASE)
 
-    def regex_iter(self, regex: re.Pattern, text: str) -> List[str]:
-        """
-        Returns a list of all non-overlapping matches of the regular expression in the string.
+    def regex_iter(self, regex: re.Pattern, text: str) -> list[str]:
+        """Returns a list of all non-overlapping matches of the regular expression in the string.
 
         Args:
             regex (re.Pattern):
@@ -105,8 +100,7 @@ class RegexHelper(object):
         return [re.group() for re in re.finditer(regex, text.lower())]
 
     def regex_patterns(self, text: str) -> dict:
-        """
-        Returns a dictionary containing regex patterns for domain, email, IPV4, MD5, SHA1, SHA256, and URL.
+        """Returns a dictionary containing regex patterns for domain, email, IPV4, MD5, SHA1, SHA256, and URL.
 
         Args:
             text (str):
