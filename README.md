@@ -38,6 +38,14 @@ poetry install
 
 ## Usage
 
+1. Create the virtual environment
+
+```text
+poetry shell
+```
+
+2. Run using the following commands:
+
 ```text
 python ioc_extractor.py <Directory containing potential IOCs>
 ```
