@@ -1,6 +1,6 @@
 # IOC Extractor
 
-This program is designed to extract Indicators of Compromise (IOCs) from specific file types. It scans the provided directory for files with specified extensions and searches for patterns such as IP addresses, email addresses, and more.
+This program extracts Indicators of Compromise (IOCs) from text and document files and produces triage-friendly output. It scans the provided directory recursively, filters obvious placeholders and local-only values, and saves both structured JSON and CSV reports.
 
 **IOCs:**
 
@@ -14,47 +14,50 @@ This program is designed to extract Indicators of Compromise (IOCs) from specifi
 
 ## Prerequisites
 
-Python 3.6+
+- Python 3.12+
+- `uv`
 
 ## Installation
 
 1. Clone the repository:
 
-```text
-git clone https://github.com/dfirsec/ioc_extractor.git
-```
+    ```text
+    git clone https://github.com/dfirsec/ioc_extractor.git
+    ```
 
 2. Navigate to the project directory:
 
-```text
-cd ioc_extractor
-```
+    ```text
+    cd ioc_extractor
+    ```
 
-1. Install the required dependencies:
+3. Create or sync the environment with `uv`:
 
-```text
-poetry install
-```
+    ```text
+    uv sync
+    ```
+
+This installs the project dependencies from `pyproject.toml` and `uv.lock`.
 
 ## Usage
 
-1. Create the virtual environment
+Run the extractor with `uv`:
 
 ```text
-poetry shell
+uv run ioc_extractor.py <Directory containing potential IOCs>
 ```
 
-2. Run using the following commands:
+If you prefer, the equivalent explicit form is:
 
 ```text
-python ioc_extractor.py <Directory containing potential IOCs>
+uv run python ioc_extractor.py <Directory containing potential IOCs>
 ```
 
-> Replace \<Directory containing potential IOCs> with the path to the directory where the files to be scanned are located.
+> Replace `<Directory containing potential IOCs>` with the path to the directory where the files to be scanned are located.
 
 ## Supported File Types
 
-The program supports the following file types:
+Text-like files:
 
 - .cfg
 - .conf
@@ -72,49 +75,62 @@ The program supports the following file types:
 - .yaml
 - .yml
 
-## Additional Functions
+Document files:
 
-The program also includes the following additional functions (see `utils/regex_helper.py`):
-
-```python
-def get_valid_tlds() -> list[str]:
-    """Uses a list of top-level domains (TLDs) and returns the list of TLDs.
-
-    Returns:
-        A list of valid top-level domains (TLDs) either from a local file named "tlds.txt" or by downloading them from IANA.org if the file is not found.
-    """
-    ...
-```
-
-This function retrieves a list of valid top-level domains (TLDs). It first checks for a local file named "tlds.txt" and returns the list of TLDs from the file if it exists. If the file is not found, it downloads the list of TLDs from IANA.org and saves them to the file.
-
---
-
-```python
-def download_tlds() -> list[str]:
-    """Downloads a list of valid top-level domains (TLDs) and saves them to a file.
-
-    Returns:
-        A list of valid top-level domains (TLDs).
-    """
-    ...
-```
-
-This function downloads the list of valid top-level domains (TLDs) from IANA.org and saves them to a file named "tlds.txt". It returns the list of downloaded TLDs.
+- .docx
+- .pptx
+- .xlsx
+- .pdf
 
 ## Output
 
-The program will display the extracted patterns organized by their type, such as "IPV4", "EMAIL", etc.  The extracted patterns will also be saved to a JSON file named results.json in the current directory.
+When actionable IOCs are found, the program writes:
+
+- `results.json`: Full structured output with a global summary and per-file context
+- `results_summary.csv`: Deduplicated IOC summary with counts and file coverage
+- `results_hits.csv`: Every retained IOC hit with file path, line number, and context
+- `ioc_whitelist.txt`: User-editable allowlist file created automatically if missing
+
+## Whitelist Format
+
+Add one entry per line in `ioc_whitelist.txt`.
+
+```text
+# Global entry
+example.com
+
+# Type-specific entry
+Domain:contoso.com
+URL:https://status.contoso.com/health
+Email:alerts@contoso.com
+```
+
+Plain values apply to every IOC type. `TYPE:value` entries apply only to that IOC type.
+
+## Behavior
+
+The extractor now:
+
+- scans directories recursively
+- parses modern Office documents (`.docx`, `.xlsx`, `.pptx`) directly from their OOXML contents
+- parses PDFs when `pypdf` is installed
+- normalizes common obfuscation such as `[.]` and `[@]`
+- removes obvious false positives such as placeholder domains and file-name-like matches
+- suppresses private, reserved, loopback, and local-only IPv4 values
+- retains the first line number and context for each IOC per file
+
+## Limitations
+
+- Legacy Office formats such as `.doc`, `.xls`, and `.ppt` are not supported.
+- PDF parsing is disabled when `pypdf` is not installed; the CLI will tell you when that is the case.
+- OOXML extraction is text-focused and does not preserve document layout.
 
 ## Example
 
 ```text
-python ioc_extractor.py "/path/to/files"
+uv run ioc_extractor.py "C:\Users\name\Documents\cases"
 ```
 
-## Contributing
-
-Contributions are welcome! If you find any issues or have suggestions for improvement, please create an issue or submit a pull request.
-
 ## License
+
 This project is licensed under the MIT License.
