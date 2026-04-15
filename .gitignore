@@ -1,4 +1,33 @@
-results.json
-tlds.txt
+# Environments
+.venv/
+.env
+.env.*
+*.local
+uv.lock
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local logs
 errors.log
-```
+*.log
+
+# Generated IOC output
+results.json
+results_summary.csv
+results_hits.csv
+results*/
+
+# Temporary local test data
+sample_iocs/
+sample_docs/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
