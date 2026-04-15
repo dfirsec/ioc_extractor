@@ -1,5 +1,6 @@
 """Extract and triage IOCs from supported document types."""
 
+import argparse
 import csv
 import ipaddress
 import json
@@ -112,6 +113,29 @@ SUPPORTED_EXTENSIONS = (
     "*.yml",
 )
 
+
+def build_argument_parser() -> argparse.ArgumentParser:
+    """Create the CLI argument parser."""
+    supported_types = ", ".join(ext.strip("*") for ext in SUPPORTED_EXTENSIONS)
+    parser = argparse.ArgumentParser(
+        description=(
+            "Recursively scan a directory for supported files, extract actionable IOCs, "
+            "and write JSON and CSV reports."
+        ),
+        epilog=(
+            "Supported file types: "
+            f"{supported_types}\n"
+            f"Outputs: {OUTPUT_JSON}, {OUTPUT_SUMMARY_CSV}, {OUTPUT_HITS_CSV}\n"
+            "Whitelist: ioc_whitelist.txt is created automatically if missing and accepts "
+            "plain values or TYPE:value entries."
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "source",
+        help="Directory containing files to scan for IOCs.",
+    )
+    return parser
 
 def get_files(source: str, extensions: tuple[str, ...]) -> list[str]:
     """Return all matching files in the directory tree."""
@@ -454,15 +478,17 @@ def main(source: str, extensions: tuple[str, ...], whitelist_path: Path = DEFAUL
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit("Usage: python ioc_extractor.py <Directory containing potential IOCs>")
-    else:
-        source = sys.argv[1]
+    parser = build_argument_parser()
+    args = parser.parse_args()
+    source = args.source
 
     output = main(source, SUPPORTED_EXTENSIONS)
     if not Path(source).is_dir():
-        console.print("Source must be a directory that exists and contains files with these extensions:")
-        [console.print(f"  {ext.strip('*')}") for ext in SUPPORTED_EXTENSIONS]
+        console.print("[bold red]Source must be an existing directory.[/bold red]")
+        console.print("Supported file types:")
+        for ext in SUPPORTED_EXTENSIONS:
+            console.print(f"  {ext.strip('*')}")
+        sys.exit(2)
     elif output:
         pprint(output)
         save_to_file(output, OUTPUT_JSON)
@@ -481,3 +507,4 @@ if __name__ == "__main__":
         console.print(f"Whitelist file: [bold]{DEFAULT_WHITELIST_PATH}[/bold]")
         if PdfReader is None:
             console.print("PDF support is disabled until `pypdf` is installed.")
+
