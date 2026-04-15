@@ -1,0 +1,7 @@
+# IOC whitelist
+# One entry per line.
+# Use either a plain value or TYPE:value.
+# Examples:
+# example.com
+# Domain:contoso.com
+# URL:https://status.contoso.com/health
