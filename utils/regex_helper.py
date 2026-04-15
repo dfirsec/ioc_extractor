@@ -1,8 +1,10 @@
-"""Desc: Helper class for regular expressions."""
+"""Helper class for regular expressions."""
+
 import re
 from pathlib import Path
 
 import requests
+
 from utils.console import console
 from utils.logger import logger
 
@@ -11,11 +13,11 @@ def get_valid_tlds() -> list[str]:
     """Uses a list of top-level domains (TLDs) and returns the list of TLDs.
 
     Returns:
-        A list of valid top-level domains (TLDs) either from a local file named "tlds.txt" or by
-        downloading them from a remote source if the file is not found.
+        A list of valid top-level domains (TLDs) either from the local
+        file "tlds.txt", or by downloading them from IANA.org.
     """
     try:
-        with open(Path(__file__).resolve().parent / "tlds.txt") as fileobj:
+        with Path(Path(__file__).resolve().parent / "tlds.txt").open() as fileobj:
             return [line.strip() for line in fileobj]
     except FileNotFoundError:
         return download_tlds()
@@ -25,21 +27,20 @@ def download_tlds() -> list[str]:
     """Downloads a list of valid top-level domains (TLDs) and saves them to a file.
 
     Returns:
-        A list of valid top-level domains (TLDs) that have been downloaded and
-        written to a file specified by the `filename` parameter.
+        A list of valid top-level domains (TLDs).
     """
     log = logger()
     console.print("[blue][!] The TLD file is missing, downloading file...\n")
     try:
         response = requests.get("https://data.iana.org/TLD/tlds-alpha-by-domain.txt", timeout=10)
         response.raise_for_status()
-    except requests.exceptions.RequestException as err:
-        log.error(f"Error downloading file: {err}")
+    except requests.exceptions.RequestException:
+        log.exception("Error downloading file")
         return []
     tlds = response.text.strip().split("\n")
     valid_tlds = [tld.lower() for tld in tlds]
 
-    with open(Path(__file__).resolve().parent / "tlds.txt", "w") as fileobj:
+    with Path(Path(__file__).resolve().parent / "tlds.txt").open("w") as fileobj:
         fileobj.write("\n".join(valid_tlds))
     return valid_tlds
 
@@ -47,7 +48,7 @@ def download_tlds() -> list[str]:
 class RegexHelper:
     """Helper class for regular expressions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Load valid TLDs from file."""
         self.tlds = get_valid_tlds()
 
@@ -68,7 +69,7 @@ class RegexHelper:
         pattern = {
             "domain": (
                 r"([A-Za-z0-9]+(?:[\-|\.|][A-Za-z0-9]+)*(?:\[\.\]|\.)(?![a-z-]*.[i\.e]$|[e\.g]$)"
-                rf"(?:{tld_pattern})\b|(?:\[\.\][a-z]{2,4})(?!@)$)"
+                rf"(?:{tld_pattern})\b|(?:\[\.\][a-z]{2, 4})(?!@)$)"
             ),
             "url": (
                 r"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}"
