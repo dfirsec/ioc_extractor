@@ -1,4 +1,5 @@
 """Logging configuration for the project."""
+
 import logging
 
 from rich.logging import RichHandler
@@ -7,17 +8,22 @@ from rich.logging import RichHandler
 class LazyFileHandler(logging.FileHandler):
     """A file handler that is initialized only when an error is logged."""
 
-    def __init__(self: "LazyFileHandler", *args, **kwargs) -> None:
-        """Initialization that stores the arguments and keyword arguments passed to it."""
-        self._args = args
-        self._kwargs = kwargs
-        self._initialized = False
-
-    def _initialize(self: "LazyFileHandler") -> None:
-        """Initializes the file handler if it has not been initialized yet."""
-        if not self._initialized:
-            super().__init__(*self._args, **self._kwargs)
-            self._initialized = True
+    def __init__(
+        self: "LazyFileHandler",
+        filename: str,
+        mode: str = "a",
+        encoding: str | None = None,
+        delay: bool = False,
+        errors: str | None = None,
+    ) -> None:
+        """Initialize the handler without opening the file until the first error record."""
+        super().__init__(
+            filename,
+            mode=mode,
+            encoding=encoding,
+            delay=True,
+            errors=errors,
+        )
 
     def emit(self, record: logging.LogRecord) -> None:
         """Emits a log record if its level is equal to or greater than ERROR.
@@ -27,7 +33,6 @@ class LazyFileHandler(logging.FileHandler):
               Contains all the information about a log message.
         """
         if record.levelno >= logging.ERROR:
-            self._initialize()
             super().emit(record)
 
 
