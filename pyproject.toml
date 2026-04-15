@@ -1,19 +1,25 @@
-[tool.poetry]
+[project]
 name = "ioc-extractor"
 version = "0.1.1"
 description = "Extract IOCs from 'text' type files"
-authors = ["Mitch Haddadi <12067255+dfirsec@users.noreply.github.com>"]
-license = "MIT"
+authors = [{ name = "Mitch Haddadi", email = "12067255+dfirsec@users.noreply.github.com" }]
+requires-python = ">=3.12"
 readme = "README.md"
-packages = [{include = "ioc_extractor"}]
+license = "MIT"
+dependencies = [
+    "rich",
+    "chardet",
+    "requests",
+    "tqdm",
+    "pypdf",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-rich = "^13.3.4"
-chardet = "^5.1.0"
-requests = "^2.29.0"
+[tool.hatch.build.targets.sdist]
+include = ["ioc_extractor"]
 
+[tool.hatch.build.targets.wheel]
+include = ["ioc_extractor"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
